@@ -12,7 +12,7 @@ searchButton.addEventListener("click", () => {
     if (location) {
         fetchWeather(location);
     } else {
-        alert("Please enter a City name");
+        alert("Please enter a city name");
     }
 });
 
@@ -22,18 +22,19 @@ function fetchWeather(location) {
     fetch(url)
         .then((response) => {
             if (!response.ok) {
-                throw new Error("Weather data not available or invalid city");
+                throw new Error("City not found or server error");
             }
             return response.json();
-        
         })
         .then((data) => {
             locationElement.textContent = data.name;
             temperatureElement.textContent = `${Math.round(data.main.temp)}°C`;
             descriptionElement.textContent = data.weather[0].description;
-
         })
         .catch((error) => {
             console.error("Error fetching weather data:", error);
+            locationElement.textContent = "Error";
+            temperatureElement.textContent = "";
+            descriptionElement.textContent = error.message;
         });
 }
