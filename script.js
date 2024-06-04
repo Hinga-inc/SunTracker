@@ -1,6 +1,3 @@
-const apiKey = "bd63b41c4c58cd3ab801e871daae6296";
-const apiUrl = "https://api.openweathermap.org/data/2.5/weather";
-
 const locationInput = document.getElementById("locationInput");
 const searchButton = document.getElementById("searchButton");
 const locationElement = document.getElementById("location");
@@ -17,23 +14,29 @@ searchButton.addEventListener("click", () => {
 });
 
 function fetchWeather(location) {
-    const url = `${apiUrl}?q=${location}&appid=${apiKey}&units=metric`;
+    const url = `/weather?location=${encodeURIComponent(location)}`;
 
     fetch(url)
         .then((response) => {
             if (!response.ok) {
-                throw new Error("Weather data not available or invalid city");
+                return response.json().then(err => {
+                    throw new Error(err.message || "Weather data not available");
+                });
             }
             return response.json();
-        
         })
         .then((data) => {
             locationElement.textContent = data.name;
             temperatureElement.textContent = `${Math.round(data.main.temp)}°C`;
             descriptionElement.textContent = data.weather[0].description;
 
+            document.body.style.backgroundImage = `url('backgrounds/${data.weather[0].icon}.jpg')`;
         })
         .catch((error) => {
             console.error("Error fetching weather data:", error);
+            locationElement.textContent = "Error";
+            temperatureElement.textContent = "";
+            descriptionElement.textContent = error.message;
+            document.body.style.backgroundImage = "url('backgrounds/error.jpg')";
         });
 }
